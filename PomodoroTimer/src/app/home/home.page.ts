@@ -24,20 +24,24 @@ export class HomePage {
     LocalNotifications.requestPermissions().then(result => {
       if (result.display === 'granted') {
         console.log('Permission granted');
-      } else {
+      } 
+      
+      else {
         console.warn('Permission denied');
       }
     });
   }
 
   startTimer() {
-    if (this.timerRunning) return; // Prevent multiple clicks
+    if (this.timerRunning) return; 
     this.timerRunning = true;
 
     this.interval = setInterval(() => {
       if (this.timeLeft > 0) {
         this.timeLeft--;
-      } else if (this.timeLeft === 0) {
+      } 
+      
+      else if (this.timeLeft === 0) {
         clearInterval(this.interval);
         this.localnotifService.sendWorkSessionEndNotification(); 
         this.startBreak(); 
@@ -52,7 +56,9 @@ export class HomePage {
     this.interval = setInterval(() => {
       if (this.timeLeft > 0) {
         this.timeLeft--;
-      } else {
+      } 
+      
+      else {
         clearInterval(this.interval); 
         this.localnotifService.sendBreakEndNotification(); 
         
