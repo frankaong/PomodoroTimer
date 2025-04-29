@@ -1,0 +1,17 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Pomodoro Timer
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-text-center">
+  <div class="center-content">
+    <h1>{{ formatTime(timeLeft) }}</h1>
+    <ion-button 
+      (click)="startTimer()" 
+      [disabled]="timerRunning">Start</ion-button>
+  </div>
+</ion-content>
+
