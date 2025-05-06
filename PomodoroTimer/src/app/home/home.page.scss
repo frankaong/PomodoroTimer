@@ -6,6 +6,7 @@
   right: 0;
   top: 50%;
   transform: translateY(-50%);
+  
 }
 
 #container strong {
@@ -31,5 +32,44 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  height:450px;
+  margin-top: -20px;
+}
+
+body {
+  --ion-background-color: #FF4C4C;
+}
+
+.startbutton {
+  --background: #FF4C4C;
+  color: #471515;
+  margin-top: 50px;
+  width: 70px;
+  height: 50px;
+  --border-radius: 20px;
+}
+
+.time-display {
+  display: flex;
+  flex-direction: column; 
+  font-size: 100px; 
+  font-weight: 600;
+  margin-top: -150px;
+}
+
+.time-display span {
+  display: block;
+  margin: 0; 
+  padding: 0; 
+  margin-bottom: -30px;
+}
+
+.state {
+  margin-top: -10px;
+
+}
+
+.header {
+  margin-top: 20px;
+  height: 70px;
 }

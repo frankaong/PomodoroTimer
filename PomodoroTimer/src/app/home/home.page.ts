@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
-import { LocalnotifService } from '../services/localnotif/localnotif.service'
+import { Component, OnInit } from '@angular/core';
+import { LocalnotifService } from '../services/localnotif/localnotif.service';
 import { App } from '@capacitor/app';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { TimerSettingsService } from '../services/timer-settings.service';
+import { ThemeserviceService } from '../services/themeservice.service';
 
 @Component({
   selector: 'app-home',
@@ -9,29 +11,42 @@ import { LocalNotifications } from '@capacitor/local-notifications';
   styleUrls: ['home.page.scss'],
   standalone: false,
 })
-export class HomePage {
-  constructor(private localnotifService: LocalnotifService ) {}
-
-  timeLeft: number = 1500; 
+export class HomePage implements OnInit {
+  timeLeft: number = 0;
   interval: any;
   timerRunning: boolean = false;
+  timerState: string = 'Focus Diva!';
 
-  ngOnInit() {
+  constructor(
+    private themeService: ThemeserviceService,
+    private localnotifService: LocalnotifService,
+    private timerSettings: TimerSettingsService
+  ) {}
+
+  async ngOnInit() {
     App.addListener('backButton', () => {
       App.exitApp();
     });
-  
+
     LocalNotifications.requestPermissions().then(result => {
       if (result.display === 'granted') {
-        console.log('Permission granted');
+        console.log('Notification permission granted');
       } else {
-        console.warn('Permission denied');
+        console.warn('Notification permission denied');
       }
     });
   }
 
+  async ionViewWillEnter() {
+    await this.themeService.loadTheme();
+    await this.timerSettings.loadSettings(); 
+    this.timeLeft = this.timerSettings.getFocusLength();
+    this.timerState = 'Focus Diva!';
+  }
+
   startTimer() {
-    if (this.timerRunning) return; // Prevent multiple clicks
+    if (this.timerRunning) return;
+    clearInterval(this.interval);
     this.timerRunning = true;
 
     this.interval = setInterval(() => {
@@ -39,28 +54,29 @@ export class HomePage {
         this.timeLeft--;
       } else if (this.timeLeft === 0) {
         clearInterval(this.interval);
-        this.localnotifService.sendWorkSessionEndNotification(); 
-        this.startBreak(); 
+        this.localnotifService.sendWorkSessionEndNotification();
+        this.startBreak();
       }
     }, 1000);
   }
 
   startBreak() {
-    this.timeLeft = 300; 
-    this.localnotifService.sendBreakStartNotification(); 
-  
+    this.timerState = 'Break <3';
+    this.timeLeft = this.timerSettings.getBreakLength();
+    this.localnotifService.sendBreakStartNotification();
+
     this.interval = setInterval(() => {
       if (this.timeLeft > 0) {
         this.timeLeft--;
       } else {
-        clearInterval(this.interval); 
-        this.localnotifService.sendBreakEndNotification(); 
-        
-        this.timeLeft = 1500;
+        clearInterval(this.interval);
+        this.localnotifService.sendBreakEndNotification();
+
+        this.timeLeft = this.timerSettings.getFocusLength();
         this.timerRunning = false;
       }
     }, 1000);
-  }  
+  }
 
   formatTime(totalSeconds: number): string {
     const minutes = Math.floor(totalSeconds / 60);

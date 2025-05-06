@@ -1,13 +1,35 @@
 import { Injectable } from '@angular/core';
 import { LocalNotifications, PermissionStatus, LocalNotificationSchema, ScheduleResult } from '@capacitor/local-notifications';
-
+import { Preferences } from '@capacitor/preferences';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocalnotifService {
+  notificationsEnabled: boolean = true;
+  soundEnabled: boolean = true;
 
-  constructor() { }
+  constructor() {
+    this.loadSettings();
+  }
+
+  async loadSettings() {
+    const notif = await Preferences.get({ key: 'notificationsEnabled' });
+    const sound = await Preferences.get({ key: 'soundEnabled' });
+
+    this.notificationsEnabled = notif.value !== 'false';
+    this.soundEnabled = sound.value !== 'false';
+  }
+
+  async setNotificationsEnabled(value: boolean) {
+    this.notificationsEnabled = value;
+    await Preferences.set({ key: 'notificationsEnabled', value: String(value) });
+  }
+
+  async setSoundEnabled(value: boolean) {
+    this.soundEnabled = value;
+    await Preferences.set({ key: 'soundEnabled', value: String(value) });
+  }
 
   async checkNotificationPermissions(): Promise<PermissionStatus> {
     const permissions = await LocalNotifications.checkPermissions();
@@ -15,15 +37,19 @@ export class LocalnotifService {
     return permissions;
   }
 
-  
   async requestNotificationPermissions(): Promise<PermissionStatus> {
     const permissions = await LocalNotifications.requestPermissions();
     console.log('Updated permissions:', permissions);
     return permissions;
   }
 
-  
   async scheduleNotification(notification: LocalNotificationSchema) {
+    if (!this.notificationsEnabled) return;
+
+    if (!this.soundEnabled) {
+      delete notification.sound;
+    }
+
     await LocalNotifications.schedule({
       notifications: [notification],
     });
@@ -36,44 +62,40 @@ export class LocalnotifService {
     return pending;
   }
 
-  
   async cancelNotification(id: number) {
     await LocalNotifications.cancel({ notifications: [{ id }] });
     console.log(`Notification with ID ${id} canceled.`);
   }
 
-  
   async sendWorkSessionEndNotification() {
     const notification: LocalNotificationSchema = {
       title: 'Pomodoro Timer',
-      body: 'Your work session has ended! Take a 5-minute break.',
+      body: 'Your work session has ended!! <3.',
       id: 1,
-      schedule: { at: new Date(new Date().getTime() + 500) }, 
-      sound: 'default',  
+      schedule: { at: new Date(new Date().getTime() + 500) },
+      sound: 'default',
     };
     this.scheduleNotification(notification);
   }
 
-  
   async sendBreakStartNotification() {
     const notification: LocalNotificationSchema = {
       title: 'Pomodoro Timer',
-      body: 'Your break has started! Relax for 5 minutes.',
+      body: 'Your break has started! Rest up girlypop <3.',
       id: 2,
-      schedule: { at: new Date(new Date().getTime() + 500) }, 
-      sound: 'default',  
+      schedule: { at: new Date(new Date().getTime() + 500) },
+      sound: 'default',
     };
     this.scheduleNotification(notification);
   }
 
-  
   async sendBreakEndNotification() {
     const notification: LocalNotificationSchema = {
       title: 'Pomodoro Timer',
-      body: 'Your break is over! Time to get back to work.',
+      body: 'Your break is over! Grindset Tym </3.',
       id: 3,
-      schedule: { at: new Date(new Date().getTime() + 500) }, 
-      sound: 'default',  
+      schedule: { at: new Date(new Date().getTime() + 500) },
+      sound: 'default',
     };
     this.scheduleNotification(notification);
   }

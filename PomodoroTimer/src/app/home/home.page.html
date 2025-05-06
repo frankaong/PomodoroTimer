@@ -1,17 +1,31 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Pomodoro Timer
-    </ion-title>
+
+  <ion-toolbar class="header">
+
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/settings']">
+        <ion-icon name="settings-outline"></ion-icon>
+      </ion-button>
+</ion-buttons>
+<br>
   </ion-toolbar>
-</ion-header>
+
 
 <ion-content [fullscreen]="true" class="ion-text-center">
+
   <div class="center-content">
-    <h1>{{ formatTime(timeLeft) }}</h1>
+    <ion-title class="state">
+      {{ timerState }}
+    </ion-title>
+    <h1><div class="time-display">
+      <span>{{ formatTime(timeLeft).split(":")[0] }}</span>
+      <span>{{ formatTime(timeLeft).split(":")[1] }}</span>
+    </div></h1>
     <ion-button 
+    class="startbutton"
       (click)="startTimer()" 
-      [disabled]="timerRunning">Start</ion-button>
+      [disabled]="timerRunning">
+      <ion-icon name="play"></ion-icon>
+    </ion-button>
   </div>
 </ion-content>
 
